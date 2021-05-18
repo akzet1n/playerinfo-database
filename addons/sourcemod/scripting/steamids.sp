@@ -10,7 +10,7 @@ public Plugin myinfo =
     name = "SteamIDs Database",
     author = "akz",
     description = "Saves each player SteamID's into a MySQL database.",
-    version = "1.0",
+    version = "1.1",
     url = "https://github.com/akzet1n/steamids-database"
 };
 
