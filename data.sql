@@ -1,3 +1,4 @@
+
 CREATE TABLE `data` (
   `steamid` varchar(32) NOT NULL,
   `first_visit` datetime NOT NULL,
