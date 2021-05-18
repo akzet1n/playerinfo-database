@@ -24,7 +24,7 @@ public void ConnectSQL(Database db, const char[] error, any data)
     if(db == null)
     {
         LogError("Failed to connect to MySQL server: %s", error);
-    } 
+    }
     else
     {
         g_hDatabase = db;
@@ -37,7 +37,7 @@ public void OnClientPutInServer(int client)
     {
         char query[128], steamid[32]; 
         GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid)); 
-        FormatEx(query, sizeof(query), "SELECT * FROM data WHERE steamid = '%s'", steamid); 
+        Format(query, sizeof(query), "SELECT * FROM data WHERE steamid = '%s'", steamid); 
         g_hDatabase.Query(QuerySQL, query, GetClientUserId(client)); 
     } 
 } 
@@ -50,14 +50,19 @@ public void QuerySQL(Database db, DBResultSet results, const char[] error, any d
         return;
     }
 
+    char query[128], steamid[32];
+    int client = GetClientOfUserId(data);
+    GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
+
     if(!SQL_FetchRow(results))
     {
-        int client = GetClientOfUserId(data);
-        char query[128], steamid[32]; 
-        GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
-        Format(query, sizeof(query), "INSERT INTO data VALUES ('%s')", steamid); 
-        g_hDatabase.Query(InsertSQL, query);
+        Format(query, sizeof(query), "INSERT INTO data(steamid, last_visit) VALUES ('%s', NOW())", steamid);
     }
+    else
+    {
+        Format(query, sizeof(query), "REPLACE INTO data(steamid, last_visit) VALUES ('%s', NOW())", steamid);
+    }
+    g_hDatabase.Query(InsertSQL, query);
 }
 
 public void InsertSQL(Database db, DBResultSet results, const char[] error, any data)
