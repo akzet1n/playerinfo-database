@@ -10,7 +10,7 @@ public Plugin myinfo =
     name = "SteamIDs Database",
     author = "akz",
     description = "Saves each player SteamID's into a MySQL database.",
-    version = "1.1",
+    version = "1.2",
     url = "https://github.com/akzet1n/steamids-database"
 };
 
@@ -56,11 +56,11 @@ public void QuerySQL(Database db, DBResultSet results, const char[] error, any d
 
     if(!SQL_FetchRow(results))
     {
-        Format(query, sizeof(query), "INSERT INTO data(steamid, last_visit) VALUES ('%s', NOW())", steamid);
+        Format(query, sizeof(query), "INSERT INTO data(steamid, first_visit, last_visit) VALUES ('%s', NOW(), NOW())", steamid);
     }
     else
     {
-        Format(query, sizeof(query), "REPLACE INTO data(steamid, last_visit) VALUES ('%s', NOW())", steamid);
+        Format(query, sizeof(query), "UPDATE data SET last_visit = NOW() WHERE steamid = '%s'", steamid);
     }
     g_hDatabase.Query(InsertSQL, query);
 }
