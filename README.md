@@ -1,6 +1,7 @@
 # SteamIDs Database
 Save each player SteamID's into a MySQL database as soon as they join the server. Ideal to keep tracking of how many unique users a gameserver has in a certain time span.
-Only tested in Counter-Strike: Global Offensive servers with a MySQL server.
+
+> Only tested in Counter-Strike: Global Offensive servers with a MySQL server.
 
 # Usage
 - Create a MySQL database.
