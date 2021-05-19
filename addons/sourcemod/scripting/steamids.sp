@@ -31,7 +31,7 @@ public void ConnectSQL(Database db, const char[] error, any data)
     }
 }
 
-public void OnClientPutInServer(int client) 
+public void OnClientAuthorized(int client) 
 { 
     if(!IsFakeClient(client) && g_hDatabase != null) 
     {
