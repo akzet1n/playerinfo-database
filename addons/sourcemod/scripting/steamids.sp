@@ -10,7 +10,7 @@ public Plugin myinfo =
     name = "SteamIDs Database",
     author = "akz",
     description = "Saves each player SteamID's into a MySQL database.",
-    version = "1.2",
+    version = "1.4",
     url = "https://github.com/akzet1n/steamids-database"
 };
 
@@ -31,22 +31,22 @@ public void ConnectSQL(Database db, const char[] error, any data)
     }
 }
 
-public void OnClientAuthorized(int client) 
-{ 
-    if(!IsFakeClient(client) && g_hDatabase != null) 
+public void OnClientAuthorized(int client)
+{
+    if(!IsFakeClient(client) && g_hDatabase != null)
     {
-        char query[128], steamid[32]; 
-        GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid)); 
-        Format(query, sizeof(query), "SELECT * FROM data WHERE steamid = '%s'", steamid); 
-        g_hDatabase.Query(QuerySQL, query, GetClientUserId(client)); 
-    } 
-} 
+        char query[128], steamid[32];
+        GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
+        Format(query, sizeof(query), "SELECT * FROM data WHERE steamid = '%s'", steamid);
+        g_hDatabase.Query(QuerySQL, query, GetClientUserId(client));
+    }
+}
 
 public void QuerySQL(Database db, DBResultSet results, const char[] error, any data)
 {
     if(db == null || results == null)
     { 
-        LogError("QuerySQL has returned the following error: %s", error); 
+        LogError("QuerySQL has returned the following error: %s", error);
         return;
     }
 
@@ -67,9 +67,9 @@ public void QuerySQL(Database db, DBResultSet results, const char[] error, any d
 
 public void InsertSQL(Database db, DBResultSet results, const char[] error, any data)
 {
-    if(db == null || results == null) 
-    { 
-        LogError("InsertSQL has returned the following error: %s", error); 
+    if(db == null || results == null)
+    {
+        LogError("InsertSQL has returned the following error: %s", error);
         return;
     }
 }
