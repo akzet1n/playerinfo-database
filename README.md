@@ -5,5 +5,5 @@ Saves the SteamID and IP address of a player into a SQL database as soon as they
 
 # Usage
 - Create a MySQL database.
-- Add the database information into your configuration file (addons/sourcemod/configs/databases.cfg).
+- Add the database information in "steamid-ip" into your configuration file (addons/sourcemod/configs/databases.cfg).
 - Upload steamids.smx into your gameserver.
