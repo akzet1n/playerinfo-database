@@ -10,7 +10,7 @@ public Plugin myinfo =
     name = "SteamID & IP Database",
     author = "akz",
     description = "Saves the SteamID and IP of each player into a database.",
-    version = "1.5",
+    version = "1.6",
     url = "https://github.com/akzet1n/steamid-ip-database"
 };
 
@@ -36,12 +36,12 @@ public void SQLCallback_Connect(Database db, const char[] error, any data)
 
         if(StrEqual(driver, "sqlite"))
         {
-            Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `data` (`steamid` varchar(32) NOT NULL, `ip` varchar(16) NOT NULL, `first_visit` datetime NOT NULL, `last_visit` datetime NOT NULL, UNIQUE(steamid))");
+            Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `data` (`steamid` varchar(32) NOT NULL, `ip` varchar(16) NOT NULL, `first_visit` datetime NOT NULL, `last_visit` datetime NOT NULL)");
 
         }
         else
         {   
-            Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `data` (`steamid` varchar(32) NOT NULL, `ip` varchar(16) NOT NULL, `first_visit` datetime NOT NULL, `last_visit` datetime NOT NULL, UNIQUE(steamid)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+            Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `data` (`steamid` varchar(32) NOT NULL, `ip` varchar(16) NOT NULL, `first_visit` datetime NOT NULL, `last_visit` datetime NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
         }
 
         g_hDatabase.Query(SQLCallback_CreateTable, query);
@@ -60,9 +60,10 @@ public void OnClientAuthorized(int client)
 {
     if(!IsFakeClient(client) && g_hDatabase != null)
     {
-        char query[128], steamid[32];
+        char query[128], steamid[32], address[16];
         GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
-        Format(query, sizeof(query), "SELECT * FROM data WHERE steamid = '%s'", steamid);
+        GetClientIP(client, address, sizeof(address));
+        Format(query, sizeof(query), "SELECT * FROM data WHERE (steamid = '%s' AND ip = '%s')", steamid, address);
         g_hDatabase.Query(SQLCallback_Query, query, GetClientUserId(client));
     }
 }
@@ -86,7 +87,7 @@ public void SQLCallback_Query(Database db, DBResultSet results, const char[] err
     }
     else
     {
-        Format(query, sizeof(query), "UPDATE data SET last_visit = NOW(), ip = '%s' WHERE steamid = '%s'", address, steamid);
+        Format(query, sizeof(query), "UPDATE data SET last_visit = NOW() WHERE (steamid = '%s' AND ip = '%s')", steamid, address);
     }
 
     g_hDatabase.Query(SQLCallback_Insert, query);
