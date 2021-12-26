@@ -1,15 +1,19 @@
 #include <sourcemod>
+#include <SteamWorks>
+#include <json>
 
 #pragma semicolon 1
 #pragma newdecls required
 
 Database g_hDatabase = null;
+char g_hCountryCode[4];
+char g_hIsp[128];
 
 public Plugin myinfo =
 {
     name = "Player Info Database",
     author = "akz",
-    description = "Saves the information of each player into a database.",
+    description = "Saves some information of each player into a database.",
     version = "1.7",
     url = "https://github.com/akzet1n/playerinfo-database"
 };
@@ -18,39 +22,28 @@ public void OnPluginStart()
 {
     Database.Connect(SQLCallback_Connect, "playerinfo");
 }
-    
+
 public void SQLCallback_Connect(Database db, const char[] error, any data)
 {
-    if(db == null)
+    if (db == null)
     {
         SetFailState("Failed to connect to database: %s", error);
     }
     else
     {
-        LogMessage("Conecction to database succesfully.");
+        LogMessage("Conecction to database succesfully");
 
         g_hDatabase = db;
-        char driver[64], query[256];
-        DBDriver tmp = g_hDatabase.Driver;
-        tmp.GetIdentifier(driver, sizeof(driver));
-
-        if(StrEqual(driver, "sqlite"))
-        {
-            Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `data` (`steamid` varchar(32) NOT NULL, `ip` varchar(16) NOT NULL, `country` varchar(2) NOT NULL, `isp` varchar(128) NOT NULL, `first_join` datetime NOT NULL, `last_join` datetime NOT NULL)");
-
-        }
-        else
-        {   
-            Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `data` (`steamid` varchar(32) NOT NULL, `ip` varchar(16) NOT NULL, `country` varchar(2) NOT NULL, `isp` varchar(128) NOT NULL, `first_join` datetime NOT NULL, `last_join` datetime NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-        }
-
+        char query[512];
+        Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `data` (`steamid` varchar(32) NOT NULL, `ip` varchar(16) NOT NULL, `cc` varchar(4) NOT NULL, `isp` varchar(128) NOT NULL, `first_connect` datetime NOT NULL, `last_connect` datetime NOT NULL, `times_connected` int DEFAULT 0, CONSTRAINT pk PRIMARY KEY (steamid, ip))");
+        
         g_hDatabase.Query(SQLCallback_CreateTable, query);
     }
 }
 
 public void SQLCallback_CreateTable(Database db, DBResultSet results, const char[] error, any data)
 {
-    if(db == null || results == null)
+    if (db == null || results == null)
     {
         SetFailState("SQLCallback_CreateTables error: %s", error);
     }
@@ -58,46 +51,65 @@ public void SQLCallback_CreateTable(Database db, DBResultSet results, const char
 
 public void OnClientAuthorized(int client)
 {
-    if(!IsFakeClient(client) && g_hDatabase != null)
+    if (!IsFakeClient(client) && g_hDatabase != null)
     {
-        char query[128], steamid[32], address[16];
-        GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
-        GetClientIP(client, address, sizeof(address));
-        Format(query, sizeof(query), "SELECT * FROM data WHERE (steamid = '%s' AND ip = '%s')", steamid, address);
-        g_hDatabase.Query(SQLCallback_Query, query, GetClientUserId(client));
+        char url[128], ip[16];
+        GetClientIP(client, ip, sizeof(ip));
+        Format(url, sizeof(url), "http://ip-api.com/json/%s?fields=countryCode,isp", ip);
+        Handle request = SteamWorks_CreateHTTPRequest(k_EHTTPMethodGET, url);
+        SteamWorks_SetHTTPCallbacks(request, SteamWorks_HTTPRequestCompleted);
+        SteamWorks_SendHTTPRequest(request);
+        CreateTimer(0.5, InsertAfterHTTPRequest, client);
     }
 }
 
-public void SQLCallback_Query(Database db, DBResultSet results, const char[] error, any data)
+public int SteamWorks_HTTPRequestCompleted(Handle hRequest, bool bFailure, bool bRequestSuccessful, EHTTPStatusCode eStatusCode)
 {
-    if(db == null || results == null)
-    { 
-        LogError("SQLCallback_Query error: %s", error);
-        return;
-    }
-
-    char query[256], steamid[32], address[16];
-    int client = GetClientOfUserId(data);
-    GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
-    GetClientIP(client, address, sizeof(address));
-
-    if(!SQL_FetchRow(results))
+    if (eStatusCode != k_EHTTPStatusCode200OK)
     {
-        Format(query, sizeof(query), "INSERT INTO data(steamid, ip, first_join, last_join) VALUES ('%s', '%s', NOW(), NOW())", steamid, address);
+        LogError("SteamWorks_HTTPRequestCompleted error: %d", eStatusCode);
     }
     else
     {
-        Format(query, sizeof(query), "UPDATE data SET last_join = NOW() WHERE (steamid = '%s' AND ip = '%s')", steamid, address);
+        int size;
+        SteamWorks_GetHTTPResponseBodySize(hRequest, size);
+        char[] body = new char[size];
+        SteamWorks_GetHTTPResponseBodyData(hRequest, body, size);
+        JSON_Object obj = view_as<JSON_Object>(json_decode(body));
+        obj.GetString("countryCode", g_hCountryCode, sizeof(g_hCountryCode));
+        obj.GetString("isp", g_hIsp, sizeof(g_hIsp));
+        obj.Cleanup();
+        delete obj;
     }
+}
 
+public Action InsertAfterHTTPRequest(Handle timer, int client)
+{
+    char query[256], steamid[32], ip[16];
+    GetClientIP(client, ip, sizeof(ip));
+    GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
+    Format(query, sizeof(query), "INSERT INTO data (steamid, ip, cc, isp, first_connect) VALUES ('%s', '%s', '%s', '%s', NOW()) ON DUPLICATE KEY UPDATE steamid = '%s'", steamid, ip, g_hCountryCode, g_hIsp, steamid);
     g_hDatabase.Query(SQLCallback_Insert, query);
 }
 
 public void SQLCallback_Insert(Database db, DBResultSet results, const char[] error, any data)
 {
-    if(db == null || results == null)
+    if (db == null || results == null)
     { 
         LogError("SQLCallback_Insert error: %s", error);
-        return;
+    }
+}
+
+public void OnClientDisconnect(int client)
+{
+    if (!IsFakeClient(client) && g_hDatabase != null)
+    {
+        char query[128], steamid[32], ip[16];
+        GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
+        GetClientIP(client, ip, sizeof(ip));
+        Format(query, sizeof(query), "UPDATE data SET last_connect = NOW() WHERE (steamid = '%s' AND ip = '%s')", steamid, ip);
+        g_hDatabase.Query(SQLCallback_Insert, query);
+        Format(query, sizeof(query), "UPDATE data SET times_connected = times_connected + 1 WHERE (steamid = '%s' AND ip = '%s')", steamid, ip);
+        g_hDatabase.Query(SQLCallback_Insert, query);
     }
 }
