@@ -7,18 +7,18 @@ Database g_hDatabase = null;
 
 public Plugin myinfo =
 {
-    name = "SteamID & IP Database",
+    name = "Player Info Database",
     author = "akz",
-    description = "Saves the SteamID and IP of each player into a database.",
-    version = "1.6",
-    url = "https://github.com/akzet1n/steamid-ip-database"
+    description = "Saves the information of each player into a database.",
+    version = "1.7",
+    url = "https://github.com/akzet1n/playerinfo-database"
 };
 
 public void OnPluginStart()
 {
-    Database.Connect(SQLCallback_Connect, "steamid-ip");
+    Database.Connect(SQLCallback_Connect, "playerinfo");
 }
-
+    
 public void SQLCallback_Connect(Database db, const char[] error, any data)
 {
     if(db == null)
@@ -36,12 +36,12 @@ public void SQLCallback_Connect(Database db, const char[] error, any data)
 
         if(StrEqual(driver, "sqlite"))
         {
-            Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `data` (`steamid` varchar(32) NOT NULL, `ip` varchar(16) NOT NULL, `first_visit` datetime NOT NULL, `last_visit` datetime NOT NULL)");
+            Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `data` (`steamid` varchar(32) NOT NULL, `ip` varchar(16) NOT NULL, `country` varchar(2) NOT NULL, `isp` varchar(128) NOT NULL, `first_join` datetime NOT NULL, `last_join` datetime NOT NULL)");
 
         }
         else
         {   
-            Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `data` (`steamid` varchar(32) NOT NULL, `ip` varchar(16) NOT NULL, `first_visit` datetime NOT NULL, `last_visit` datetime NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+            Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `data` (`steamid` varchar(32) NOT NULL, `ip` varchar(16) NOT NULL, `country` varchar(2) NOT NULL, `isp` varchar(128) NOT NULL, `first_join` datetime NOT NULL, `last_join` datetime NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
         }
 
         g_hDatabase.Query(SQLCallback_CreateTable, query);
@@ -83,11 +83,11 @@ public void SQLCallback_Query(Database db, DBResultSet results, const char[] err
 
     if(!SQL_FetchRow(results))
     {
-        Format(query, sizeof(query), "INSERT INTO data(steamid, ip, first_visit, last_visit) VALUES ('%s', '%s', NOW(), NOW())", steamid, address);
+        Format(query, sizeof(query), "INSERT INTO data(steamid, ip, first_join, last_join) VALUES ('%s', '%s', NOW(), NOW())", steamid, address);
     }
     else
     {
-        Format(query, sizeof(query), "UPDATE data SET last_visit = NOW() WHERE (steamid = '%s' AND ip = '%s')", steamid, address);
+        Format(query, sizeof(query), "UPDATE data SET last_join = NOW() WHERE (steamid = '%s' AND ip = '%s')", steamid, address);
     }
 
     g_hDatabase.Query(SQLCallback_Insert, query);
