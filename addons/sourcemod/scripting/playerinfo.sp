@@ -14,7 +14,7 @@ public Plugin myinfo =
     name = "Player Info Database",
     author = "akz",
     description = "Saves some information of each player into a database.",
-    version = "1.7",
+    version = "1.7.1",
     url = "https://github.com/akzet1n/playerinfo-database"
 };
 
@@ -31,7 +31,7 @@ public void SQLCallback_Connect(Database db, const char[] error, any data)
     }
     else
     {
-        LogMessage("Conecction to database succesfully");
+        LogMessage("Connection to database succesfully");
 
         g_hDatabase = db;
         char query[512];
@@ -104,12 +104,10 @@ public void OnClientDisconnect(int client)
 {
     if (!IsFakeClient(client) && g_hDatabase != null)
     {
-        char query[128], steamid[32], ip[16];
+        char query[256], steamid[32], ip[16];
         GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
         GetClientIP(client, ip, sizeof(ip));
-        Format(query, sizeof(query), "UPDATE data SET last_connect = NOW() WHERE (steamid = '%s' AND ip = '%s')", steamid, ip);
-        g_hDatabase.Query(SQLCallback_Insert, query);
-        Format(query, sizeof(query), "UPDATE data SET times_connected = times_connected + 1 WHERE (steamid = '%s' AND ip = '%s')", steamid, ip);
+        Format(query, sizeof(query), "UPDATE data SET last_connect = NOW(), times_connected = times_connected + 1 WHERE steamid = '%s' AND ip = '%s'", steamid, ip);
         g_hDatabase.Query(SQLCallback_Insert, query);
     }
 }
