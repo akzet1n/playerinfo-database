@@ -34,6 +34,7 @@ public void SQLCallback_Connect(Database db, const char[] error, any data)
         LogMessage("Connection to database succesfully");
 
         g_hDatabase = db;
+        SQL_SetCharset(db, "UTF8");
         char query[512];
         Format(query, sizeof(query), "CREATE TABLE IF NOT EXISTS `data` (`steamid` varchar(32) NOT NULL, `ip` varchar(16) NOT NULL, `cc` varchar(4) NOT NULL, `isp` varchar(128) NOT NULL, `first_connect` datetime NOT NULL, `last_connect` datetime NOT NULL, `times_connected` int DEFAULT 0, CONSTRAINT pk PRIMARY KEY (steamid, ip))");
         
