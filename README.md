@@ -6,8 +6,8 @@ Saves the information of each player that joins your server and sends it into a 
 ## Installation
 - Create a MySQL database.
 - Add the database information in "playerinfo" into your configuration file (addons/sourcemod/configs/databases.cfg).
-- Upload playerinfo.smx into your gameserver.
-- Load the plugin or restart the gameserver.
+- Upload playerinfo.smx into your server.
+- Load the plugin or restart the server.
 
 ## Examples
 - Get the number of unique users
