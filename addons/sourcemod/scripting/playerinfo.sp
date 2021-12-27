@@ -14,7 +14,7 @@ public Plugin myinfo =
     name = "Player Info Database",
     author = "akz",
     description = "Saves some information of each player into a database.",
-    version = "1.7.1",
+    version = "1.7.2",
     url = "https://github.com/akzet1n/playerinfo-database"
 };
 
