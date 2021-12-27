@@ -46,3 +46,14 @@ SELECT * FROM data WHERE last_connect = (SELECT MAX(last_connect) FROM data)
 SELECT * FROM data WHERE times_connected = (SELECT MAX(times_connected) FROM data)
 ```
 
+- Get the number of players per each country
+
+```
+SELECT cc, COUNT(*) AS players FROM data GROUP BY cc;
+```
+
+- Get the number of players per each ISP
+
+```
+SELECT isp, COUNT(*) AS players FROM data GROUP BY isp;
+```
