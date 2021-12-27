@@ -59,7 +59,7 @@ public void OnClientAuthorized(int client)
         Handle request = SteamWorks_CreateHTTPRequest(k_EHTTPMethodGET, url);
         SteamWorks_SetHTTPCallbacks(request, SteamWorks_HTTPRequestCompleted);
         SteamWorks_SendHTTPRequest(request);
-        CreateTimer(0.5, InsertAfterHTTPRequest, client);
+        CreateTimer(0.5, Timer_InsertAfterHTTPRequest, client);
     }
 }
 
@@ -83,7 +83,7 @@ public int SteamWorks_HTTPRequestCompleted(Handle hRequest, bool bFailure, bool 
     }
 }
 
-public Action InsertAfterHTTPRequest(Handle timer, int client)
+public Action Timer_InsertAfterHTTPRequest(Handle timer, int client)
 {
     char query[256], steamid[32], ip[16];
     GetClientIP(client, ip, sizeof(ip));

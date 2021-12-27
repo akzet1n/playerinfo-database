@@ -1,7 +1,7 @@
 # Player Info Database
 Saves the information of a player like SteamID, IP address, country and ISP into a SQL database as soon as they join the server, with two timestamps, one at the first join, and the other one at the last join. Ideal to keep track of how many unique players your server has, make stats in a certain time span, etc.
 
-> Only tested in Counter-Strike: Global Offensive servers with a MySQL server.
+> Only tested in a Counter-Strike: Global Offensive server together with a MySQL server.
 
 # Installation
 - Create a MySQL database.
