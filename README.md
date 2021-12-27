@@ -1,5 +1,5 @@
 # Player Info Database
-Saves the information of each player that joins your server and sends it into a database. Ideal to keep track of the users that are playing around your server, get stats with the interval you want, daily, weekly, etc. At the moment, the plugin is gathering the following values: **Steam ID**, **IP Address**, **Country Code**, **ISP**, **First join date**, **Last seen date**, **Number of Connections** & **Time played**.
+Saves the information of each player that joins your server and sends it into a database. Ideal to keep track of the users that are playing around your server, get stats with the interval you want, daily, weekly, etc. At the moment, the plugin is gathering the following values: **Steam ID**, **IP Address**, **Country Code**, **ISP**, **First join date**, **Last seen date**, **Number of Connections** & **Time Played**.
 
 > Only tested in a Counter-Strike: Global Offensive server with a MySQL server.
 
