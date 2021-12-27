@@ -34,7 +34,7 @@ SELECT * FROM data WHERE last_connect > NOW() - INTERVAL 1 HOUR
 SELECT * FROM data WHERE first_connect = (SELECT MIN(first_connect) FROM data)
 ```
 
-- Get the latest player who joined the server
+- Get the latest player who left the server
 
 ```
 SELECT * FROM data WHERE last_connect = (SELECT MAX(last_connect) FROM data)
@@ -56,4 +56,28 @@ SELECT cc, COUNT(*) AS players FROM data GROUP BY cc;
 
 ```
 SELECT isp, COUNT(*) AS players FROM data GROUP BY isp;
+```
+
+- Get the country with the most players
+
+```
+SELECT cc, COUNT(*) AS players FROM data GROUP BY cc ORDER BY players DESC LIMIT 1
+```
+
+- Get the ISP with the most players
+
+```
+SELECT isp, COUNT(*) AS players FROM data GROUP BY isp ORDER BY players DESC LIMIT 1
+```
+
+- Get the country with the least players
+
+```
+SELECT cc, COUNT(*) AS players FROM data GROUP BY cc ORDER BY players ASC LIMIT 1
+```
+
+- Get the ISP with the least players
+
+```
+SELECT isp, COUNT(*) AS players FROM data GROUP BY isp ORDER BY players ASC LIMIT 1
 ```
