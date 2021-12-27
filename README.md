@@ -1,5 +1,5 @@
 # Player Info Database
-Saves the information of each player that joins your server and sends it into a database. Ideal to keep track of the users that are playing around your server, get stats with the interval you want, daily, weekly, etc. At the moment, the plugin is gathering the following values: **Steam ID**, **IP Address**, **Country Code**, **ISP**, **First join date**, **Last seen date** and **Number of Connections**.
+Saves the information of each player that joins your server and sends it into a database. Ideal to keep track of the users that are playing around your server, get stats with the interval you want, daily, weekly, etc. At the moment, the plugin is gathering the following values: **Steam ID**, **IP Address**, **Country Code**, **ISP**, **First join date**, **Last seen date**, **Number of Connections** & **Time played**.
 
 > Only tested in a Counter-Strike: Global Offensive server with a MySQL server.
 
@@ -25,19 +25,19 @@ SELECT COUNT(DISTINCT ip) FROM data
 - Get the players that have joined in the last hour
 
 ```
-SELECT * FROM data WHERE last_connect > NOW() - INTERVAL 1 HOUR
+SELECT * FROM data WHERE last_seen > NOW() - INTERVAL 1 HOUR
 ```
 
 - Get the player who first joined the server
 
 ```
-SELECT * FROM data WHERE first_connect = (SELECT MIN(first_connect) FROM data)
+SELECT * FROM data WHERE first_join = (SELECT MIN(first_join) FROM data)
 ```
 
 - Get the latest player who left the server
 
 ```
-SELECT * FROM data WHERE last_connect = (SELECT MAX(last_connect) FROM data)
+SELECT * FROM data WHERE last_seen = (SELECT MAX(last_seen) FROM data)
 ```
 
 - Get the player who has connected the most times
@@ -49,13 +49,13 @@ SELECT * FROM data WHERE times_connected = (SELECT MAX(times_connected) FROM dat
 - Get the number of players per each country
 
 ```
-SELECT cc, COUNT(*) AS players FROM data GROUP BY cc;
+SELECT cc, COUNT(*) AS players FROM data GROUP BY cc ORDER BY players DESC
 ```
 
 - Get the number of players per each ISP
 
 ```
-SELECT isp, COUNT(*) AS players FROM data GROUP BY isp;
+SELECT isp, COUNT(*) AS players FROM data GROUP BY isp ORDER BY players DESC
 ```
 
 - Get the country with the most players
@@ -81,3 +81,12 @@ SELECT cc, COUNT(*) AS players FROM data GROUP BY cc ORDER BY players ASC LIMIT 
 ```
 SELECT isp, COUNT(*) AS players FROM data GROUP BY isp ORDER BY players ASC LIMIT 1
 ```
+
+- Get the player who has been on the server the longest
+
+```
+SELECT * FROM data WHERE seconds_connected = (SELECT MAX(seconds_connected) FROM data)
+```
+
+
+
