@@ -1,15 +1,15 @@
 # Player Info Database
-Saves the information of a player like SteamID, IP address, country and ISP into a SQL database as soon as they join the server, with two timestamps, one at the first join, and the other one at the last join. Ideal to keep track of how many unique players your server has, make stats in a certain time span, etc.
+Saves the information of each player that joins your server and sends it into a database. Ideal to keep track of the users that are playing around your server, get stats with the interval you want, daily, weekly, etc. At the moment, the plugin is gathering the following values: **Steam ID**, **IP Address**, **Country Code**, **ISP**, **First join date**, **Last seen date** and **Number of Connections**.
 
-> Only tested in a Counter-Strike: Global Offensive server together with a MySQL server.
+> Only tested in a Counter-Strike: Global Offensive server with a MySQL server.
 
-# Installation
+## Installation
 - Create a MySQL database.
-- Add the database information in "steamid-ip" into your configuration file (addons/sourcemod/configs/databases.cfg).
-- Upload steamids.smx into your gameserver.
+- Add the database information in "playerinfo" into your configuration file (addons/sourcemod/configs/databases.cfg).
+- Upload playerinfo.smx into your gameserver.
 - Load the plugin or restart the gameserver.
 
-# Examples
+## Examples
 - Get the number of unique users
 
 ```
@@ -25,18 +25,24 @@ SELECT COUNT(DISTINCT ip) FROM data
 - Get the players that have joined in the last hour
 
 ```
-SELECT * FROM data WHERE last_join > NOW() - INTERVAL 1 HOUR
+SELECT * FROM data WHERE last_connect > NOW() - INTERVAL 1 HOUR
 ```
 
 - Get the player who first joined the server
 
 ```
-SELECT * FROM data WHERE first_join = (SELECT MIN(first_join) FROM data)
+SELECT * FROM data WHERE first_connect = (SELECT MIN(first_connect) FROM data)
 ```
 
 - Get the latest player who joined the server
 
 ```
-SELECT * FROM data WHERE last_join = (SELECT MAX(last_join) FROM data)
+SELECT * FROM data WHERE last_connect = (SELECT MAX(last_connect) FROM data)
+```
+
+- Get the player who has connected the most times
+
+```
+SELECT * FROM data WHERE times_connected = (SELECT MAX(times_connected) FROM data)
 ```
 
