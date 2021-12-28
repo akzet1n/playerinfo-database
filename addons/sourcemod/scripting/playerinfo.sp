@@ -13,7 +13,7 @@ public Plugin myinfo =
     name = "Player Info Database",
     author = "akz",
     description = "Saves some information of each player into a database.",
-    version = "1.9",
+    version = "1.9.1",
     url = "https://github.com/akzet1n/playerinfo-database"
 };
 
@@ -53,7 +53,6 @@ public void OnClientAuthorized(int client)
         GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
         GetClientIP(client, ip, sizeof(ip));
         Format(url, sizeof(url), "%s/%s", api, ip);
-        PrintToServer(url);
         Handle request = SteamWorks_CreateHTTPRequest(k_EHTTPMethodGET, url);
         SteamWorks_SetHTTPRequestContextValue(request, client);
         SteamWorks_SetHTTPCallbacks(request, HTTPRequestCompleted);
