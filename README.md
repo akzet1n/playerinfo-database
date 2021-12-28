@@ -89,4 +89,4 @@ SELECT * FROM data WHERE seconds_connected = (SELECT MAX(seconds_connected) FROM
 ```
 
 ## IP-API.com
-By default, the plugin is using [IP-API.com](https://ip-api.com) in a free version that can take up to 45 requests in a single minute. If the plugin requests more than 45 times in a single minute, the API will begin to throttle down all the requets until the minute has passed. If you have a high number of concurrent players, that can exceed that rate limit, you can pay for a premium version or make your own API.
+By default, the plugin is using [IP-API.com](https://ip-api.com) in a free version that can take up to 45 requests in a single minute. If the plugin requests more than 45 times in a single minute, the API will begin to throttle down all the requests until the minute has passed. If you have a high number of concurrent players, that can exceed that rate limit, you can pay for a premium version or make your own API.
