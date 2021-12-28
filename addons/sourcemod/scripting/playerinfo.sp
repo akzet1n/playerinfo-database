@@ -6,19 +6,22 @@
 #pragma newdecls required
 
 Database g_Database = null;
+ConVar g_Api;
 
 public Plugin myinfo =
 {
     name = "Player Info Database",
     author = "akz",
     description = "Saves some information of each player into a database.",
-    version = "1.8.1",
+    version = "1.9",
     url = "https://github.com/akzet1n/playerinfo-database"
 };
 
 public void OnPluginStart()
 {
     Database.Connect(ConnectToDb, "playerinfo");
+    g_Api = CreateConVar("sm_playerinfo_api", "http://ip-api.com/json", "API endpoint to get the values for Country Code and ISP of each player");
+    AutoExecConfig(true, "playerinfo", "sourcemod");
 }
 
 public void ConnectToDb(Database db, const char[] failure, any data)
@@ -45,10 +48,12 @@ public void OnClientAuthorized(int client)
 {
     if (!IsFakeClient(client) && g_Database != null)
     {
-        char url[128], steamid[32], ip[16];
+        char api[128], url[128], steamid[32], ip[16];
+        GetConVarString(g_Api, api, sizeof(api));
         GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
         GetClientIP(client, ip, sizeof(ip));
-        Format(url, sizeof(url), "http://ip-api.com/json/%s?fields=countryCode,isp", ip);
+        Format(url, sizeof(url), "%s/%s", api, ip);
+        PrintToServer(url);
         Handle request = SteamWorks_CreateHTTPRequest(k_EHTTPMethodGET, url);
         SteamWorks_SetHTTPRequestContextValue(request, client);
         SteamWorks_SetHTTPCallbacks(request, HTTPRequestCompleted);
