@@ -13,7 +13,7 @@ public Plugin myinfo =
     name = "Player Info Database",
     author = "akz",
     description = "Saves some information of each player into a database.",
-    version = "1.9.1",
+    version = "1.9.2",
     url = "https://github.com/akzet1n/playerinfo-database"
 };
 
@@ -48,7 +48,7 @@ public void OnClientAuthorized(int client)
 {
     if (!IsFakeClient(client) && g_Database != null)
     {
-        char api[128], url[128], steamid[32], ip[16];
+        char api[64], url[64], steamid[32], ip[16];
         GetConVarString(g_Api, api, sizeof(api));
         GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
         GetClientIP(client, ip, sizeof(ip));
@@ -92,7 +92,7 @@ public Action InsertAfterHTTPRequestCompleted(Handle timer, DataPack dp)
     int client = dp.ReadCell();
     if (!IsFakeClient(client) && g_Database != null)
     {
-        char query[256], steamid[32], ip[16], cc[4], isp[128];
+        char query[512], steamid[32], ip[16], cc[4], isp[128];
         GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
         GetClientIP(client, ip, sizeof(ip));
         dp.ReadString(cc, sizeof(cc));
