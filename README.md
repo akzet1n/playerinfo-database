@@ -10,7 +10,7 @@ Saves the information of each player that joins your server and sends it into a 
 - Load the plugin or restart the server.
 
 ## Examples
-- Get the number of unique users
+- Get the number of unique Steam ID's
 
 ```
 SELECT COUNT(DISTINCT steamid) FROM data
@@ -31,61 +31,37 @@ SELECT * FROM data WHERE last_seen > NOW() - INTERVAL 1 HOUR
 - Get the player who first joined the server
 
 ```
-SELECT * FROM data WHERE first_join = (SELECT MIN(first_join) FROM data)
+SELECT * FROM data ORDER BY first_join ASC LIMIT 1
 ```
 
 - Get the latest player who left the server
 
 ```
-SELECT * FROM data WHERE last_seen = (SELECT MAX(last_seen) FROM data)
+SELECT * FROM data ORDER BY last_seen DESC LIMIT 1
 ```
 
 - Get the player who has connected the most times
 
 ```
-SELECT * FROM data WHERE times_connected = (SELECT MAX(times_connected) FROM data)
+SELECT * FROM data ORDER BY times_connected DESC LIMIT 1
 ```
 
 - Get the number of players per each country
 
 ```
-SELECT cc, COUNT(*) AS players FROM data GROUP BY cc ORDER BY players DESC
+SELECT COUNT(DISTINCT steamid), cc FROM data GROUP BY cc ORDER BY COUNT(DISTINCT steamid) DESC
 ```
 
 - Get the number of players per each ISP
 
 ```
-SELECT isp, COUNT(*) AS players FROM data GROUP BY isp ORDER BY players DESC
-```
-
-- Get the country with the most players
-
-```
-SELECT cc, COUNT(*) AS players FROM data GROUP BY cc ORDER BY players DESC LIMIT 1
-```
-
-- Get the ISP with the most players
-
-```
-SELECT isp, COUNT(*) AS players FROM data GROUP BY isp ORDER BY players DESC LIMIT 1
-```
-
-- Get the country with the least players
-
-```
-SELECT cc, COUNT(*) AS players FROM data GROUP BY cc ORDER BY players ASC LIMIT 1
-```
-
-- Get the ISP with the least players
-
-```
-SELECT isp, COUNT(*) AS players FROM data GROUP BY isp ORDER BY players ASC LIMIT 1
+SELECT COUNT(DISTINCT steamid), isp FROM data GROUP BY isp ORDER BY COUNT(DISTINCT steamid) DESC
 ```
 
 - Get the player who has been on the server the longest
 
 ```
-SELECT * FROM data WHERE seconds_connected = (SELECT MAX(seconds_connected) FROM data)
+SELECT * FROM data ORDER BY seconds_connected DESC LIMIT 1
 ```
 
 ## IP-API.com
