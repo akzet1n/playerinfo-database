@@ -74,7 +74,7 @@ public int HTTPRequestCompleted(Handle hRequest, bool bFailure, bool bRequestSuc
         char[] body = new char[size];
         SteamWorks_GetHTTPResponseBodyData(hRequest, body, size);
         JSON_Object obj = view_as<JSON_Object>(json_decode(body));
-        obj.GetString("countryCode", cc, sizeof(cc));
+        obj.GetString("cc", cc, sizeof(cc));
         obj.GetString("isp", isp, sizeof(isp));
         obj.Cleanup();
         delete obj;
